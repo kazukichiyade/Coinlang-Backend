@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -38,6 +39,14 @@ func articleIndex(c echo.Context) error {
 	return c.String(http.StatusOK, GetBitcoinApi())
 }
 
+//type BitflyerBitcoin struct {
+//	Bitcoin string
+//	Id      string
+//	Time    time.Time
+//}
+
+//var coin BitflyerBitcoin
+
 // BitFlyerのBitcoinのAPIを取得する関数
 func GetBitcoinApi() string {
 
@@ -47,19 +56,36 @@ func GetBitcoinApi() string {
 		log.Fatal(err)
 	}
 
+	fmt.Println(resp)
+
 	// 最後にapiをCloseする
 	defer resp.Body.Close()
 
 	// ReadAllは、エラーまたはEOFに達するまで読み込み、読み込んだデータを返す
 	byteArray, err := ioutil.ReadAll(resp.Body)
-
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println(byteArray)
+
+	/*var bitcoin bitflyerBitcoins
+	err = json.Unmarshal(body, &bicoin)
+	if err != nil {
+		log.Fatal(err)
+	}*/
+
 	// byte配列をstring型へキャスト
 	castString := string(byteArray)
 
 	// a := json.Unmarshal(byteArray)
+	//fmt.Println(castString)
+
+	//resp2 := json.Unmarshal(byteArray, &coin)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//fmt.Println(reflect.TypeOf(resp2))
 
 	return castString
 }
