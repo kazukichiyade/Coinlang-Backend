@@ -6,6 +6,9 @@
 *.dylib
 *.idea
 
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+
 # Test binary, built with `go test -c`
 *.test
 
