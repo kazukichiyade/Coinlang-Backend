@@ -1,9 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
+	// "encoding/json"
+	// "fmt"
 
 	"github.com/labstack/gommon/log"
 
@@ -22,12 +24,13 @@ func main() {
 	// パスとarticleIndexを紐付けている
 	e.GET("/", articleIndex)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":9000"))
 }
 
 func createMux() *echo.Echo {
 	e := echo.New()
 
+	e.Use(middleware.CORS())
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
 	e.Use(middleware.Gzip())
@@ -39,13 +42,21 @@ func articleIndex(c echo.Context) error {
 	return c.String(http.StatusOK, GetBitcoinApi())
 }
 
-//type BitflyerBitcoin struct {
-//	Bitcoin string
-//	Id      string
-//	Time    time.Time
-//}
-
-//var coin BitflyerBitcoin
+// 対応出来ていない
+type BitflyerBitcoin struct {
+	Bitcoin string `json:"product_code"`
+	Time    time.Time `json:"timestamp"`
+	Id      int `json:"tick_id"`
+	BestBid int `json:"best_bid"`
+	BestAsk int `json:"best_ask"`
+	BestBidSize int `json:"best_bid_size"`
+	BestAskSize int `json: "best_ask_size"`
+	TotalBidDepth int `json:"total_bid_depth"`
+	TotalAskDepth int `json:"total_ask_depth"`
+	Ltp int `json:"ltp"`
+	Volume int `json:"volume"`
+	VolumeByProduct int `json:"volume_by_product"`
+}
 
 // BitFlyerのBitcoinのAPIを取得する関数
 func GetBitcoinApi() string {
@@ -56,36 +67,25 @@ func GetBitcoinApi() string {
 		log.Fatal(err)
 	}
 
-	fmt.Println(resp)
-
 	// 最後にapiをCloseする
 	defer resp.Body.Close()
 
 	// ReadAllは、エラーまたはEOFに達するまで読み込み、読み込んだデータを返す
-	byteArray, err := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(byteArray)
-
-	/*var bitcoin bitflyerBitcoins
-	err = json.Unmarshal(body, &bicoin)
-	if err != nil {
-		log.Fatal(err)
-	}*/
+	// 対応出来ていない
+	// var bitcoin BitflyerBitcoin
+	// if err := json.Unmarshal(body, &bitcoin); err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println(body)
 
 	// byte配列をstring型へキャスト
-	castString := string(byteArray)
+	BitcoinString := string(body)
 
-	// a := json.Unmarshal(byteArray)
-	//fmt.Println(castString)
-
-	//resp2 := json.Unmarshal(byteArray, &coin)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//fmt.Println(reflect.TypeOf(resp2))
-
-	return castString
+	return BitcoinString
 }
