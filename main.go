@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+
 	// "encoding/json"
 	// "fmt"
 
@@ -16,20 +17,23 @@ import (
 // 依存パッケージの読み込み > グローバル定数 > グローバル変数 > init() > main() の順に実行（判定）される
 
 // bitflyerのベースurlとエンドポイント
-const bitflyerBaseUrl = "https://api.bitflyer.jp/v1/getticker?product_code="
+const bitflyerBaseURL = "https://api.bitflyer.jp/v1/getticker?product_code="
 
-var e = createMux()
+var e = echoStart()
 
 func main() {
-	// パスとarticleIndexを紐付けている
+	// `/` というパス（URL）と `articleIndex` という処理を結びつける
 	e.GET("/", articleIndex)
 
+	// Webサーバーをポート番号 9000 で起動する
 	e.Logger.Fatal(e.Start(":9000"))
 }
 
-func createMux() *echo.Echo {
+func echoStart() *echo.Echo {
+	// アプリケーションインスタンスを生成
 	e := echo.New()
 
+	// アプリケーションに各種ミドルウェアを設定
 	e.Use(middleware.CORS())
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
@@ -39,35 +43,37 @@ func createMux() *echo.Echo {
 }
 
 func articleIndex(c echo.Context) error {
-	return c.String(http.StatusOK, GetBitcoinApi())
+
+	// ステータスコード 200 で、GetBitcoinAPI関数で取得した文字列をレスポンス
+	return c.String(http.StatusOK, GetBitcoinAPI())
 }
 
-// 対応出来ていない
+// BitflyerBitcoin is ビットフライヤーのビットコインの構造体(jsonの表記を変更予定)
 type BitflyerBitcoin struct {
-	Bitcoin string `json:"product_code"`
-	Time    time.Time `json:"timestamp"`
-	Id      int `json:"tick_id"`
-	BestBid int `json:"best_bid"`
-	BestAsk int `json:"best_ask"`
-	BestBidSize int `json:"best_bid_size"`
-	BestAskSize int `json: "best_ask_size"`
-	TotalBidDepth int `json:"total_bid_depth"`
-	TotalAskDepth int `json:"total_ask_depth"`
-	Ltp int `json:"ltp"`
-	Volume int `json:"volume"`
-	VolumeByProduct int `json:"volume_by_product"`
+	Bitcoin         string    `json:"product_code"`
+	Time            time.Time `json:"timestamp"`
+	ID              int       `json:"tick_id"`
+	BestBid         int       `json:"best_bid"`
+	BestAsk         int       `json:"best_ask"`
+	BestBidSize     int       `json:"best_bid_size"`
+	BestAskSize     int       `json:"best_ask_size"`
+	TotalBidDepth   int       `json:"total_bid_depth"`
+	TotalAskDepth   int       `json:"total_ask_depth"`
+	Ltp             int       `json:"ltp"`
+	Volume          int       `json:"volume"`
+	VolumeByProduct int       `json:"volume_by_product"`
 }
 
-// BitFlyerのBitcoinのAPIを取得する関数
-func GetBitcoinApi() string {
+// GetBitcoinAPI is BitFlyerのBitcoinのAPIを取得する関数
+func GetBitcoinAPI() string {
 
 	// GetでWebAPIに対してアクセスする
-	resp, err := http.Get(bitflyerBaseUrl + "btc_jpy")
+	resp, err := http.Get(bitflyerBaseURL + "btc_jpy")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// 最後にapiをCloseする
+	// 最後にWebAPIに対してのアクセスをCloseする
 	defer resp.Body.Close()
 
 	// ReadAllは、エラーまたはEOFに達するまで読み込み、読み込んだデータを返す
