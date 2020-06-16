@@ -19,6 +19,15 @@ import (
 // bitflyerのベースurlとエンドポイント
 const bitflyerBaseURL = "https://api.bitflyer.jp/v1/getticker?product_code="
 
+// BitflyerCoin is Bitflyerにあるコインの構造体 (jsonのkeyの表記を変更できるかつkeyと一致しないvalueは保持しない)
+type BitflyerCoin struct {
+	Coin            string    `json:"product_code"` // コイン名
+	Time            time.Time `json:"timestamp"`    // 時間
+	BestBid         int       `json:"best_bid"`     // 売値
+	BestAsk         int       `json:"best_ask"`     // 買値
+	LastTradedPrice int       `json:"ltp"`          // 最終取引価格
+}
+
 var e = echoStart()
 
 func main() {
@@ -46,22 +55,6 @@ func articleIndex(c echo.Context) error {
 
 	// ステータスコード 200 で、GetBitcoinAPI関数で取得した文字列をレスポンス
 	return c.String(http.StatusOK, GetBitcoinAPI())
-}
-
-// BitflyerBitcoin is ビットフライヤーのビットコインの構造体(jsonの表記を変更予定)
-type BitflyerBitcoin struct {
-	Bitcoin         string    `json:"product_code"`
-	Time            time.Time `json:"timestamp"`
-	ID              int       `json:"tick_id"`
-	BestBid         int       `json:"best_bid"`
-	BestAsk         int       `json:"best_ask"`
-	BestBidSize     int       `json:"best_bid_size"`
-	BestAskSize     int       `json:"best_ask_size"`
-	TotalBidDepth   int       `json:"total_bid_depth"`
-	TotalAskDepth   int       `json:"total_ask_depth"`
-	Ltp             int       `json:"ltp"`
-	Volume          int       `json:"volume"`
-	VolumeByProduct int       `json:"volume_by_product"`
 }
 
 // GetBitcoinAPI is BitFlyerのBitcoinのAPIを取得する関数
