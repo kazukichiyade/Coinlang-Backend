@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -55,7 +56,7 @@ func articleIndex(c echo.Context) error {
 }
 
 // GetBitcoinAPI is BitFlyerのBitcoinのAPIを取得する関数
-func GetBitcoinAPI() []BitflyerCoin {
+func GetBitcoinAPI() BitflyerCoin {
 
 	// WebAPIに対してアクセスする
 	resp, err := http.Get(bitflyerBaseURL + "btc_jpy")
@@ -72,26 +73,11 @@ func GetBitcoinAPI() []BitflyerCoin {
 		log.Fatal(err)
 	}
 
-	var bitcoin []BitflyerCoin
+	var bitcoin BitflyerCoin
 	if err := json.Unmarshal(body, &bitcoin); err != nil {
 		log.Fatal(err)
 	}
 
-	// var bitcoin BitflyerCoin
-	// if err := json.Unmarshal(body, &bitcoin); err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(bitcoin)
-
-	// u := new(BitflyerCoin)
-	// err = json.Unmarshal(body, u)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(body)
-
-	// byte配列をstring型へキャスト
-	// BitcoinString := string(bitcoin)
-
+	fmt.Println(bitcoin)
 	return bitcoin
 }
