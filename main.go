@@ -17,6 +17,9 @@ import (
 // bitflyerのベースurlとエンドポイント
 const bitflyerBaseURL = "https://api.bitflyer.jp/v1/getticker?product_code="
 
+// bitbankのベースurl
+const bitbankBaseURL = "https://public.bitbank.cc/"
+
 // BitflyerCoin is Bitflyerにあるコインの構造体 (jsonのkeyの表記を変更できるかつkeyと一致しないvalueは保持しない)
 type BitflyerCoin struct {
 	Coin            string  `json:"product_code"` // コイン名
@@ -30,7 +33,8 @@ var e = echoStart()
 
 func main() {
 	// `/` というパス（URL）と `articleIndex` という処理を結びつける
-	e.GET("/", articleIndex)
+	e.GET("/", bitcoinAPI)
+	e.GET("/", xrpAPI)
 
 	// Webサーバーをポート番号 9000 で起動する
 	e.Logger.Fatal(e.Start(":9000"))
@@ -49,7 +53,7 @@ func echoStart() *echo.Echo {
 	return e
 }
 
-func articleIndex(c echo.Context) error {
+func bitcoinAPI(c echo.Context) error {
 
 	// ステータスコード 200 で、GetBitcoinAPI関数で取得した文字列をレスポンス
 	return c.JSON(http.StatusOK, GetBitcoinAPI())
@@ -80,4 +84,39 @@ func GetBitcoinAPI() BitflyerCoin {
 
 	fmt.Println(bitcoin)
 	return bitcoin
+}
+
+func xrpAPI(c echo.Context) error {
+
+	// ステータスコード 200 で、GetBitcoinAPI関数で取得した文字列をレスポンス
+	return c.String(http.StatusOK, GetXrpAPI())
+}
+
+// GetXrpAPI is BitFlyerのXRPのAPIを取得する関数
+func GetXrpAPI() string {
+
+	// WebAPIに対してアクセスする
+	resp, err := http.Get(bitbankBaseURL + "xrp_jpy/ticker")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 最後にWebAPIに対してのアクセスをCloseする
+	defer resp.Body.Close()
+
+	// jsonを読み込む
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// var bitcoin BitflyerCoin
+	// if err := json.Unmarshal(body, &bitcoin); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	aaa := string(body)
+
+	fmt.Println(string(body))
+	return aaa
 }
